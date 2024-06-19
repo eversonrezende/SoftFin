@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SoftFin.Api.Data;
+using SoftFin.Core.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -23,11 +24,13 @@ app.UseSwaggerUI();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapPost("/api/v1/requests", (Request request, Handler handler) =>
-{
-    var response = handler.Handle(request);
-    return Results.Created($"/api/v1/requests/{response.Id}", response);
-});
+app.MapPost(
+    "/v1/categories",
+    (Request request, Handler handler) =>
+    handler.Handle(request))
+    .WithName("Categories: Create")
+    .WithSummary("Cria uma nova categoria")
+    .Produces<Response>();
 
 app.Run();
 
@@ -35,15 +38,7 @@ public class Request
 {
     public string Title { get; set; } = string.Empty;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    public int Type { get; set; }
-
-    public decimal Amount { get; set; }
-
-    public long CategoryId { get; set; }
-
-    public string UserId { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 }
 
 public class Response
@@ -52,15 +47,23 @@ public class Response
     public string Title { get; set; } = string.Empty;
 }
 
-public class Handler
+public class Handler(AppDbContext context)
 {
-
     public Response Handle(Request request)
     {
+        var category = new Category
+        {
+            Title = request.Title,
+            Description = request.Description
+        };
+
+        context.Categories.Add(category);
+        context.SaveChanges();
+
         var response = new Response
         {
-            Id = 1,
-            Title = request.Title
+            Id = category.Id,
+            Title = category.Title
         };
 
         return response;
