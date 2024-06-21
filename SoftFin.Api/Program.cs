@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using SoftFin.Api.Data;
 using SoftFin.Core.Models;
+using SoftFin.Core.Requests.Categories;
+using SoftFin.Core.Responses;
 
 var builder = WebApplication.CreateBuilder(args);
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -26,10 +28,10 @@ app.MapGet("/", () => "Hello World!");
 
 app.MapPost(
     "/v1/categories",
-    (Request request, Handler handler) =>
+    (CreateCategoryRequest request, Handler handler) =>
     handler.Handle(request))
     .WithName("Categories: Create")
     .WithSummary("Cria uma nova categoria")
-    .Produces<Response>();
+    .Produces<Response<Category>>();
 
 app.Run();
