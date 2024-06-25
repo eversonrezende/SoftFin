@@ -3,6 +3,7 @@ using SoftFin.Core.Handlers;
 using SoftFin.Core.Models;
 using SoftFin.Core.Requests.Categories;
 using SoftFin.Core.Responses;
+using System.Security.Claims;
 
 namespace SoftFin.Api.Endpoints.Categories;
 
@@ -17,11 +18,12 @@ public class UpdateCategoryEndpoint : IEndpoint
             .Produces<Response<Category?>>();
 
     private static async Task<IResult> HandleAsync(
+        ClaimsPrincipal user,
         ICategoryHandler handler,
         UpdateCategoryRequest request,
         long id)
     {
-        request.UserId = "teste@teste.com";
+        request.UserId = user.Identity?.Name ?? string.Empty;
         request.Id = id;
 
         var result = await handler.UpdateAsync(request);

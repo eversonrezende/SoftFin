@@ -5,6 +5,7 @@ using SoftFin.Core.Handlers;
 using SoftFin.Core.Models;
 using SoftFin.Core.Requests.Categories;
 using SoftFin.Core.Responses;
+using System.Security.Claims;
 
 namespace SoftFin.Api.Endpoints.Categories;
 
@@ -19,6 +20,7 @@ public class GetAllCategoriesEndpoint : IEndpoint
         .Produces<PagedResponse<List<Category>?>>();
 
     private static async Task<IResult> HandleAsync(
+        ClaimsPrincipal user,
         ICategoryHandler handler,
         [FromQuery] int pageNumber = Configuration.DefaultPageNumber,
         [FromQuery] int pageSize = Configuration.DefaultPageSize
@@ -26,7 +28,7 @@ public class GetAllCategoriesEndpoint : IEndpoint
     {
         var request = new GetAllCategoriesRequest
         {
-            UserId = "teste@teste.com",
+            UserId = user.Identity?.Name ?? string.Empty,
             PageNumber = pageNumber,
             PageSize = pageSize
         };

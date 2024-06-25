@@ -3,6 +3,7 @@ using SoftFin.Core.Handlers;
 using SoftFin.Core.Models;
 using SoftFin.Core.Requests.Transactions;
 using SoftFin.Core.Responses;
+using System.Security.Claims;
 
 namespace SoftFin.Api.Endpoints.Transactions;
 
@@ -17,12 +18,13 @@ public class DeleteTransactionEndpoint : IEndpoint
             .Produces<Response<Transaction?>>();
 
     private static async Task<IResult> HandleAsync(
+        ClaimsPrincipal user,
         ITransactionHandler handler,
         long id)
     {
         var request = new DeleteTransactionRequest
         {
-            UserId = "teste@teste.com",
+            UserId = user.Identity?.Name ?? string.Empty,
             Id = id
         };
 
