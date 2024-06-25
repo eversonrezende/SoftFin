@@ -3,6 +3,7 @@ using SoftFin.Core.Handlers;
 using SoftFin.Core.Models;
 using SoftFin.Core.Requests.Transactions;
 using SoftFin.Core.Responses;
+using System.Security.Claims;
 
 namespace SoftFin.Api.Endpoints.Transactions;
 
@@ -17,10 +18,11 @@ public class CreateTransactionEndpoint : IEndpoint
             .Produces<Response<Transaction?>>();
 
     private static async Task<IResult> HandleAsync(
+        ClaimsPrincipal user,
         ITransactionHandler handler,
         CreateTransactionRequest request)
     {
-        request.UserId = "teste@teste.com";
+        request.UserId = user.Identity?.Name ?? string.Empty;
 
         var result = await handler.CreateAsync(request);
 

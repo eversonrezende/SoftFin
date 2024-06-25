@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SoftFin.Core.Models;
 
-namespace SoftFin.Api.Mappings;
+namespace SoftFin.Api.Data.Mappings;
 
 public class CategoryMapping : IEntityTypeConfiguration<Category>
 {
