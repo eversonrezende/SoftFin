@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SoftFin.Api.Data;
+using SoftFin.Core.Common.Extensions;
 using SoftFin.Core.Handlers;
 using SoftFin.Core.Models;
 using SoftFin.Core.Requests.Transactions;
@@ -62,7 +63,7 @@ public class TransactionHandler(AppDbContext _context) : ITransactionHandler
         try
         {
             var transaction = await _context.Transactions
-                    .FirstOrDefaultAsync(x => 
+                    .FirstOrDefaultAsync(x =>
                         x.UserId == request.UserId && x.Id == request.Id);
 
             if (transaction is null)
@@ -76,9 +77,46 @@ public class TransactionHandler(AppDbContext _context) : ITransactionHandler
         }
     }
 
-    public Task<PagedResponse<List<Transaction>?>> GetByPeriodAsync(GetTransactionByPeriodRequest request)
+    public async Task<PagedResponse<List<Transaction>?>> GetByPeriodAsync(GetTransactionByPeriodRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            request.StartDate ??= DateTime.Now.GetFirstDay();
+            request.EndDate ??= DateTime.Now.GetLastDay();
+        }
+        catch
+        {
+            return new PagedResponse<List<Transaction>?>(null, 500, "Não foi possível determinar a data de início e de fim");
+        }
+
+        try
+        {
+            var query = _context
+                    .Transactions
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CreatedAt >= request.StartDate &&
+                        x.CreatedAt <= request.EndDate &&
+                        x.UserId == request.UserId)
+                    .OrderBy(x => x.CreatedAt);
+
+            var transactions = await query
+                    .Skip((request.PageNumber - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ToListAsync();
+
+            var count = await query.CountAsync();
+
+            return new PagedResponse<List<Transaction>?>(
+                    transactions,
+                    count,
+                    request.PageNumber,
+                    request.PageSize);
+        }
+        catch (Exception)
+        {
+            return new PagedResponse<List<Transaction>?>(null, 500, "Não foi possível recuperar as transições");
+        }
     }
 
     public async Task<Response<Transaction?>> UpdateAsync(UpdateTransactionRequest request)
@@ -86,7 +124,7 @@ public class TransactionHandler(AppDbContext _context) : ITransactionHandler
         try
         {
             var transaction = await _context.Transactions
-                            .FirstOrDefaultAsync(x => 
+                            .FirstOrDefaultAsync(x =>
                             x.UserId == request.UserId && x.Id == request.Id);
 
             if (transaction is null)

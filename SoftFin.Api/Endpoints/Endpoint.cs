@@ -1,5 +1,6 @@
 ﻿using SoftFin.Api.Common.Api;
 using SoftFin.Api.Endpoints.Categories;
+using SoftFin.Api.Endpoints.Transactions;
 
 namespace SoftFin.Api.Endpoints;
 
@@ -16,6 +17,14 @@ public static class Endpoint
             .MapEndpoint<DeleteCategoryEndpoint>()
             .MapEndpoint<GetCategoryByIdEndpoint>()
             .MapEndpoint<GetAllCategoriesEndpoint>();
+
+        endpoints.MapGroup("v1/transactions")
+            .WithTags("Transactions")
+            .MapEndpoint<CreateTransactionEndpoint>()
+            .MapEndpoint<UpdateTransactionEndpoint>()
+            .MapEndpoint<DeleteTransactionEndpoint>()
+            .MapEndpoint<GetTransactionByIdEndpoint>()
+            .MapEndpoint<GetTransactionByPeriodEndpoint>();
     }
 
     private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)
