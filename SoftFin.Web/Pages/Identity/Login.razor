@@ -1,4 +1,5 @@
 ﻿@page "/login"
+
 @layout HeadlessLayout
 
 <PageTitle>SoftFin - Entrar</PageTitle>
@@ -9,7 +10,38 @@
             <div class="d-flex justify-center pb-8 pt-8">
                 <img src="imgs/softfin.png" alt="SoftFin - Controle Financeiro" width="200" />
             </div>
-            <h1>Autentique-se</h1>
+            <MudForm @ref="_mudForm">
+                <MudTextField 
+                    T="string"
+                    Label="E-mail"
+                    InputType="InputType.Email"
+                    Required="true"
+                    RequiredError="Informe o E-mail"
+                    Validation="@(new EmailAddressAttribute {ErrorMessage = "E-mail inválido"})"
+                    />
+
+                <MudTextField 
+                    T="string"
+                    Label="Senha"
+                    InputType="InputType.Password"
+                    Required="true"
+                    RequiredError="Informe a Senha"/>
+            </MudForm>
+            <div class="d-flex mt-8">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary">
+                    ENTRAR
+                </MudButton>
+
+                <MudSpacer />
+
+                <MudButton Href="/register" Variant="Variant.Outlined" Color="Color.Primary">
+                    REGISTRAR
+                </MudButton>
+            </div>
         </MudPaper>
     </MudItem>
 </MudGrid>
+
+@code {
+    MudForm? _mudForm;
+}
