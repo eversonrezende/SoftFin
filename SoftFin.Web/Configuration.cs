@@ -5,6 +5,10 @@ namespace SoftFin.Web;
 
 public static class Configuration
 {
+    public const string HttpClientName = "softfin";
+
+    public static string BackendUrl { get; set; } = "https://localhost:7078";
+
     public static MudTheme Theme = new MudTheme
     {
         Typography = new Typography
