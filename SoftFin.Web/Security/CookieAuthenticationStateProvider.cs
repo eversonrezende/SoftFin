@@ -17,9 +17,32 @@ public class CookieAuthenticationStateProvider(IHttpClientFactory httpClientFact
         return _isAuthenticated;
     }
 
-    public override Task<AuthenticationState> GetAuthenticationStateAsync()
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        throw new NotImplementedException();
+        _isAuthenticated = false;
+
+        // Criar um usuário, pois precisamos de algum objeto ClaimsPrincipal, senão irá gerar um erro no app
+        var user = new ClaimsPrincipal(new ClaimsIdentity());
+
+        // Buscando o usuário de fato
+        var userInfo = await GetUsers();
+
+        // Se usuário nulo, retorna o user instanciado
+        if (userInfo is null)
+            return new AuthenticationState(user);
+
+        // Caso contrário, buscamos os claims do usuário
+        var claims = await GetClaims(userInfo);
+
+        // Criar o ClaimsIdentity passando os claims do usuário e o tipo de autenticação
+        var id = new ClaimsIdentity(claims, nameof(CookieAuthenticationStateProvider));
+
+        // Ai passamos ao user
+        user = new ClaimsPrincipal(id);
+
+        _isAuthenticated = true;
+
+        return new AuthenticationState(user);
     }
 
     private async Task<User?> GetUsers()
