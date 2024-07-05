@@ -23,8 +23,8 @@ Embora ainda esteja em desenvolvimento, o SoftFin tem como objetivo oferecer os 
 
 ### Pre-requisitos
 
-- .NET Core SDK
-- Visual Studio uma IDE compatível
+- .NET Core SDK versão 8.0+
+- Visual Studio ou uma IDE compatível
 - SQL Server (para operações de banco de dados)
 
 ### Iniciando
@@ -33,7 +33,8 @@ Embora ainda esteja em desenvolvimento, o SoftFin tem como objetivo oferecer os 
 2. Abrir o Arquivo de Solução SoftFin.sln no Visual Studio: Abra o arquivo de solução SoftFin.sln no Visual Studio.
 3. Restaurar os Pacotes NuGet Necessários: Certifique-se de restaurar os pacotes NuGet necessários para o projeto.
 4. Configurar as Conexões com o Banco de Dados no appsettings.json: Configure as conexões com o banco de dados no arquivo appsettings.json tanto para o projeto SoftFin.Api quanto para o projeto SoftFin.Web.
-5. Executar a Solução: Você pode escolher executar a API ou o frontend da web com base no seu foco de desenvolvimento.
+5. Executar a API: Acessar o diretório Api e executar `dotnet clean`, `dotnet build` e `dotnet run`.
+6. Executar o Frontend: Acessar o diretório Web e executar `dotnet clean`, `dotnet build` e `dotnet run`.
 
 ## Licença
 
