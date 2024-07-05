@@ -6,7 +6,7 @@ using SoftFin.Web.Security;
 
 namespace SoftFin.Web.Pages.Identity;
 
-public partial class RegisterPage : ComponentBase
+public partial class LoginPage : ComponentBase
 {
     #region Dependencies
 
@@ -27,7 +27,7 @@ public partial class RegisterPage : ComponentBase
     #region Properties
 
     public bool IsBusy { get; set; } = false;
-    public RegisterRequest InputModel { get; set; } = new();
+    public LoginRequest InputModel { get; set; } = new();
 
     #endregion
 
@@ -53,12 +53,13 @@ public partial class RegisterPage : ComponentBase
 
         try
         {
-            var result = await Handler.RegisterAsync(InputModel);
+            var result = await Handler.LoginAsync(InputModel);
 
             if (result.IsSuccess)
             {
-                Snackbar.Add(result.Message, Severity.Success);
-                NavigationManager.NavigateTo("/login");
+                await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                AuthenticationStateProvider.NotifyAuthenticationStateChanged();
+                NavigationManager.NavigateTo("/");
             }
             else
                 Snackbar.Add(result.Message, Severity.Error);
@@ -74,5 +75,4 @@ public partial class RegisterPage : ComponentBase
     }
 
     #endregion
-
 }
