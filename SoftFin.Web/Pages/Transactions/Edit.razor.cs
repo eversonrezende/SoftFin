@@ -7,12 +7,14 @@ using SoftFin.Core.Requests.Transactions;
 
 namespace SoftFin.Web.Pages.Transactions;
 
-public partial class CreateTransactionPage : ComponentBase
+public partial class EditTransactionPage : ComponentBase
 {
     #region Properties
 
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
     public bool IsBusy { get; set; } = false;
-    public CreateTransactionRequest InputModel { get; set; } = new();
+    public UpdateTransactionRequest InputModel { get; set; } = new();
     public List<Category> Categories { get; set; } = [];
 
     #endregion
@@ -36,6 +38,59 @@ public partial class CreateTransactionPage : ComponentBase
     #region Overrides
 
     protected override async Task OnInitializedAsync()
+    {
+        IsBusy = true;
+
+        try
+        {
+            await GetTransactionByIdAsync();
+            await GetCategoriesAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+    }
+
+    private async Task GetTransactionByIdAsync()
+    {
+        IsBusy = true;
+
+        try
+        {
+            var request = new GetTransactionByIdRequest { Id = long.Parse(Id) };
+            var result = await TransactionHandler.GetByIdAsync(request);
+
+            if (result.IsSuccess && result.Data is not null)
+            {
+                InputModel = new UpdateTransactionRequest
+                {
+                    CategoryId = result.Data.CategoryId,
+                    PaidOrReceivedAt = result.Data.PaidOrReceivedAt,
+                    Title = result.Data.Title,
+                    Type = result.Data.Type,
+                    Amount = result.Data.Amount,
+                    Id = result.Data.Id,
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+    }
+
+    private async Task GetCategoriesAsync()
     {
         IsBusy = true;
 
@@ -71,14 +126,16 @@ public partial class CreateTransactionPage : ComponentBase
 
         try
         {
-            var result = await TransactionHandler.CreateAsync(InputModel);
+            var result = await TransactionHandler.UpdateAsync(InputModel);
             if (result.IsSuccess)
             {
-                Snackbar.Add(result.Message, Severity.Success);
+                Snackbar.Add("Lançamento atualizado!", Severity.Success);
                 NavigationManager.NavigateTo("/transactions/records");
             }
             else
+            {
                 Snackbar.Add(result.Message, Severity.Error);
+            }
         }
         catch (Exception ex)
         {
