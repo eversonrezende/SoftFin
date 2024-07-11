@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SoftFin.Api.Data;
 using SoftFin.Core.Common.Extensions;
+using SoftFin.Core.Enums;
 using SoftFin.Core.Handlers;
 using SoftFin.Core.Models;
 using SoftFin.Core.Requests.Transactions;
@@ -12,6 +13,9 @@ public class TransactionHandler(AppDbContext _context) : ITransactionHandler
 {
     public async Task<Response<Transaction?>> CreateAsync(CreateTransactionRequest request)
     {
+        if (request.Type == ETransactionType.Withdraw && request.Amount >= 0)
+            request.Amount *= -1;
+
         try
         {
             var transaction = new Transaction
@@ -95,10 +99,10 @@ public class TransactionHandler(AppDbContext _context) : ITransactionHandler
                     .Transactions
                     .AsNoTracking()
                     .Where(x =>
-                        x.CreatedAt >= request.StartDate &&
-                        x.CreatedAt <= request.EndDate &&
+                        x.PaidOrReceivedAt >= request.StartDate &&
+                        x.PaidOrReceivedAt <= request.EndDate &&
                         x.UserId == request.UserId)
-                    .OrderBy(x => x.CreatedAt);
+                    .OrderBy(x => x.PaidOrReceivedAt);
 
             var transactions = await query
                     .Skip((request.PageNumber - 1) * request.PageSize)
@@ -121,6 +125,9 @@ public class TransactionHandler(AppDbContext _context) : ITransactionHandler
 
     public async Task<Response<Transaction?>> UpdateAsync(UpdateTransactionRequest request)
     {
+        if (request.Type == ETransactionType.Withdraw && request.Amount >= 0)
+            request.Amount *= -1;
+
         try
         {
             var transaction = await _context.Transactions
