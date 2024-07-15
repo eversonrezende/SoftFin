@@ -1,6 +1,7 @@
 ﻿using SoftFin.Api.Common.Api;
 using SoftFin.Api.Endpoints.Categories;
 using SoftFin.Api.Endpoints.Identity;
+using SoftFin.Api.Endpoints.Reports;
 using SoftFin.Api.Endpoints.Transactions;
 using SoftFin.Api.Models;
 
@@ -43,6 +44,14 @@ public static class Endpoint
             .RequireAuthorization()
             .MapEndpoint<LogoutEndpoint>()
             .MapEndpoint<GetRolesEndpoint>();
+
+        endpoints.MapGroup("v1/reports")
+            .WithTags("Reports")
+            .RequireAuthorization()
+            .MapEndpoint<GetIncomesAndExpensesEndpoint>()
+            .MapEndpoint<GetIncomesByCategoryEndpoint>()
+            .MapEndpoint<GetExpensesByCategoryEndpoint>()
+            .MapEndpoint<GetFinancialSummaryEndpoint>();
     }
 
     private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)
